@@ -97,6 +97,8 @@ public class SyntaxAnalyzer {
         if(Const(c)){
             return true;
         }
+        if(exp(c)){return true;}
+        
         return false;
     }
     
@@ -125,7 +127,28 @@ public class SyntaxAnalyzer {
         return false;
     }
     public static boolean dec_init(String[] c){
-        
+        if(c[i].equals("DT")){
+            i++;if(c[i].equals("ID")){
+                i++;if(init(c)){
+                    if(list2(c)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    public static boolean list2(String[] c){
+        if(c[i].equals(",")){
+            i++;if(c[i].equals("ID")){
+                i++;if(init(c)){
+                    if(list2(c)){
+                        return true;
+                    }
+                }
+            }
+        }
+        //--------------------------------------------------------------------------------null
         return false;
     }
     public static boolean While_CONDITIONAL(String[] c){
@@ -478,6 +501,49 @@ public class SyntaxAnalyzer {
             }
         }
         //-------------------------------------------------------------------------------------null
+        return false;
+    }
+    public static boolean Class(String[] c){
+        if(access_modifier(c)){
+            if(c[i].equals("class")){
+                i++;if(c[i].equals("ID")){
+                    i++;if(attrib(c)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    public static boolean attrib(String[] c){
+        if(Dec(c)){
+            if(attrib(c)){
+                return true;
+            }
+        }
+        if(construct(c)){
+            return true;
+        }
+        return false;
+    }
+    public static boolean construct(String[] c){
+        if(access_modifier(c)){
+            if(c[i].equals("ID")){
+                i++;if(c[i].equals("(")){
+                    i++;if(arg_list(c)){
+                        if(c[i].equals(")")){
+                            i++;if(c[i].equals("{")){
+                                i++;if(Dec(c)){
+                                    if(c[i].equals("}")){
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 }

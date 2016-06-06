@@ -15,9 +15,9 @@ public class SyntaxAnalyzer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        //String[] cp = new String[]{"public","expose","void","start","(",")","{","DT","ID","=","int_constant",";","}"};
+        String[] cp = new String[]{"public","expose","void","start","(",")","{","DT","ID","=","int_constant",";","}"};
         //String[] cp = new String[]{"public","expose","void","start","(",")","{","DT","ID",";","}"};
-        String[] cp = new String[]{"public","expose","void","start","(",")","{","check","(","ID","Relation_operator","ID",")","{","DT","ID","=","int_constant",";","}"};
+        //String[] cp = new String[]{"public","expose","void","start","(",")","{","check","(","ID","Relation_operator","ID",")","{","DT","ID","=","int_constant",";","}"};
         //String[] cp = new String[]{"public","expose","void","start","(",")","{","next","(","DT","ID","=","int_constant",";","ID","Relation_operator","ID",";","ID","INC/DEC_OPERATORS",")","{","DT","ID","=","int_constant",";","}","}"};
         boolean b = start(cp);
         System.out.println(b);
@@ -50,7 +50,7 @@ public class SyntaxAnalyzer {
   
     public static boolean s_st(String[] c){
         if(c[i].equals(";")){i++;return true;}
-        if(Dec(c)||While_CONDITIONAL(c)||DoWhile(c)||for_CONDITIONAL(c)||if_st(c)||Assign_exp(c)){
+        if(Dec(c)||init_only(c)||While_CONDITIONAL(c)||DoWhile(c)||for_CONDITIONAL(c)||if_st(c)||Assign_exp(c)||func_call_st(c)){
             return true;
         }
         return false;
@@ -63,13 +63,16 @@ public class SyntaxAnalyzer {
                    }
             }
         }//-----------------------------------------------------------------------------------null
+        if(c[i].equals("}")){
+            return true;
+        }
         return false;
     }
     public static boolean Dec(String[] c){
         if(c[i].equals("DT")){
             i++;if(c[i].equals("ID")){
                 i++;if(init(c)){
-                    if(list(c)){
+                    if(list2(c)){
                         return true;
                     }
                 }
@@ -83,8 +86,11 @@ public class SyntaxAnalyzer {
         if(c[i].equals("=")){
             i++;if(init1(c)){
                 return true;
-            }//--------------------------------------------------------------------------------null
+            }
              
+        }//--------------------------------------------------------------------------------null
+        if(c[i].equals(",")||c[i].equals(";")){
+            return true;
         }
         return false;
     }
@@ -95,7 +101,9 @@ public class SyntaxAnalyzer {
             }
         }
         if(Const(c)){
-            return true;
+            
+              return true;
+            
         }
         if(exp(c)){return true;}
         
@@ -126,16 +134,35 @@ public class SyntaxAnalyzer {
         }
         return false;
     }
-    public static boolean dec_init(String[] c){
-        if(c[i].equals("DT")){
-            i++;if(c[i].equals("ID")){
-                i++;if(init(c)){
-                    if(list2(c)){
-                        return true;
-                    }
-                }
+    public static boolean init_only(String[] c){
+        if(c[i].equals(",")){
+            i++;if(value(c)){
+                return true;
             }
         }
+        return false;
+    }
+    public static boolean value(String[] c){
+        if(c[i].equals("=")){
+            i++;if(value1(c)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public static boolean value1(String[] c){
+        if(id_const(c)){
+            if(c[i].equals(";")){
+                i++;return true;
+            }
+        }
+        if(list1(c)){
+            return true;
+        }
+        return false;
+    }
+    public static boolean list1(String[] c){
+        if(init_only(c)){return true;}
         return false;
     }
     public static boolean list2(String[] c){
@@ -148,7 +175,8 @@ public class SyntaxAnalyzer {
                 }
             }
         }
-        //--------------------------------------------------------------------------------null
+        if(c[i].equals(";")){i++;return true;}
+        
         return false;
     }
     public static boolean While_CONDITIONAL(String[] c){
@@ -181,7 +209,7 @@ public class SyntaxAnalyzer {
     public static boolean body(String[] c){
         if(s_st(c)){return true;}
         if(m_st(c)){return true;}
-        
+        if(c[i].equals("}")){i++;return true;}
         return false;
     }
     public static boolean DoWhile(String[] c){
@@ -234,7 +262,10 @@ public class SyntaxAnalyzer {
         return false;
     }
     public static boolean y(String[] c){
-        if(cond(c)){return true;}//-----------------------------------------------------null
+        if(cond(c)){return true;}
+          //--------------------------------------------------------------------------null
+        if(c[i].equals(";")){return true;}
+        
         return false;
     }
     public static boolean z(String[] c){
@@ -253,6 +284,8 @@ public class SyntaxAnalyzer {
             return true;
         }
         //-----------------------------------------------------------------------------null
+        if(c[i].equals(")")){return true;}
+        
         return false;
     }
     public static boolean inc_dec(String[] c){
@@ -303,6 +336,8 @@ public class SyntaxAnalyzer {
             }
         }
         //----------------------------------------------------------------------------null
+        if(c[i].equals(")")||c[i].equals(";")){return true;}
+        
         return false;
     }
     public static boolean t(String[] c){
@@ -325,6 +360,7 @@ public class SyntaxAnalyzer {
     public static boolean i(String[] c){
         if(inc_dec(c)){return true;}
         //---------------------------------------------------------------------------------null
+        if(c[i].equals("MUL/DIV_OPERATORS")||c[i].equals(")")){return true;}
         return false;
     }
     public static boolean t1(String[] c){
@@ -336,6 +372,7 @@ public class SyntaxAnalyzer {
             }
         }
         //------------------------------------------------------------------------------null
+        if(c[i].equals("ADD/SUB_Operators")||c[i].equals(")")){return true;}
         return false;
     }
     public static boolean if_st(String[] c){
@@ -359,8 +396,9 @@ public class SyntaxAnalyzer {
         if(c[i].equals("then")){
             i++;if(body(c)){
                 return true;
-            }//----------------------------------------------------------------------null
-        }
+            }
+        }//-----------------------------------------------------------------------------null
+        if(body(c)){return true;}
         return false;
     }
     public static boolean function(String[] c){
